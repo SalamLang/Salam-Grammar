@@ -1,26 +1,44 @@
-@top Program { expression* }
+@top Program { Layout }
 
-@skip { space | LineComment }
+@skip { Space | Comment }
 
-expression {
-  Identifier |
+TagContent {
+  Tag |
+  Attribute
+}
+
+Finish {
+  "تمام"
+}
+
+Layout {
+  "صفحه" Start Body Finish
+}
+
+Tag {
+  Key Start Body Finish
+}
+
+Body {
+  TagContent*
+}
+
+Attribute {
+  Key Equal Value
+}
+
+Value {
   String |
-  Boolean |
-  Application { "(" expression* ")" }
+  Number
 }
 
 @tokens {
-  Identifier { $[a-zA-Z_\-0-9]+ }
+  String { '"' (!["\\] | "\\" _)* '"' | "«" (!["\\»] | "\\" _)* "»" }
+  Comment { "//" ![\n]* }
+  Number { ($[0-9\u0660-\u0669\u06F0-\u06F9])+ ("." ($[0-9\u0660-\u0669\u06F0-\u06F9])+)? }
+  Start { ":" }
+  Equal { "=" }
 
-  String { '"' (!["\\] | "\\" _)* '"' }
-
-  Boolean { "#t" | "#f" }
-
-  LineComment { ";" ![\n]* }
-
-  space { $[ \t\n\r]+ }
-
-  "(" ")"
+  Key { $[a-zA-Z_\-0-9\u0600-\u06FF]+ (" " $[a-zA-Z_\-0-9\u0600-\u06FF]+)* }
+  Space { $[ \t\n\r]+ }
 }
-
-@detectDelim
